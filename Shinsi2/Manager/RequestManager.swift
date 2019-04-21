@@ -21,6 +21,15 @@ class RequestManager {
                     url += "&favcat=\(number)"
                 }
                 cacheFavoritesTitles = page == 0
+            } else if keyword.contains("popular") {
+                if page == 0 {
+                    url = Defaults.URL.host + "/popular"
+                } else {
+                    block?([])
+                    return
+                }
+            } else if keyword.contains("watched") {
+                 url = Defaults.URL.host + "/watched?page=\(page)"
             } else if keyword.contains(",") {
                 if page == 0 {
                     getNewList(with: keyword.components(separatedBy: ","), completeBlock: block)
@@ -45,7 +54,7 @@ class RequestManager {
             guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 var items : [Doujinshi] = []
-                for link in doc.xpath("//div [@class='id3'] //a") {
+                for link in doc.xpath("//div [@class='gl3t'] //a") {
                     if let url = link["href"], let imgNode = link.at_css("img"), let imgUrl = imgNode["src"] , let title = imgNode["title"]  {
                         items.append(Doujinshi(value : ["coverUrl": imgUrl, "title": title , "url": url]))
                     }
