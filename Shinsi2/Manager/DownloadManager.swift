@@ -128,7 +128,7 @@ class DownloadManager: NSObject {
         if count == 0 {
             print("\(queue.name!): Finished!!!")
             RealmManager.shared.saveDownloadedDoujinshi(book: books[queue.name!]!)
-            queues.remove(at: queues.index(of: queue)!)
+            queues.remove(at: queues.firstIndex(of: queue)!)
             queue.removeObserver(self, forKeyPath: "operationCount")
             books.removeValue(forKey: queue.name!)
             if let nextQueue = queues.first {

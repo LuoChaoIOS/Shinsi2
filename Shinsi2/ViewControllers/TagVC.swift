@@ -24,7 +24,7 @@ class TagVC: BaseViewController {
         let keys = gTag.allProperties().keys
         for key in keys {
             if gTag[key].count != 0 {
-                let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.index(of: key) ?? 999)
+                let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
                 items.append(item)
             }
         }
