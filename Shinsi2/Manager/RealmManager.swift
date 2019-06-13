@@ -4,7 +4,7 @@ import RealmSwift
 class RealmManager {
     static let shared = RealmManager()
     let realm: Realm = {
-        let config = Realm.Configuration( schemaVersion: 7, migrationBlock: { migration, oldSchemaVersion in
+        let config = Realm.Configuration( schemaVersion: 7, migrationBlock: { _, _ in
             
         })
         Realm.Configuration.defaultConfiguration = config
@@ -47,7 +47,7 @@ class RealmManager {
         }
     }
     
-    func saveDownloadedDoujinshi(book:Doujinshi) {
+    func saveDownloadedDoujinshi(book: Doujinshi) {
         book.pages.removeAll()
         for i in 0..<book.gdata!.filecount {
             let p = Page()
@@ -67,13 +67,13 @@ class RealmManager {
         }
     }
     
-    func deleteDoujinshi(book:Doujinshi) {
+    func deleteDoujinshi(book: Doujinshi) {
         try! realm.write {
             realm.delete(book)
         }
     }
     
-    func isDounjinshiDownloaded(doujinshi:Doujinshi) -> Bool {
+    func isDounjinshiDownloaded(doujinshi: Doujinshi) -> Bool {
         return downloaded.filter("gdata.gid = '\(doujinshi.gdata!.gid)'").count != 0
     }
 }

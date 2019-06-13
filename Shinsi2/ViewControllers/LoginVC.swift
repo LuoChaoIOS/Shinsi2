@@ -30,7 +30,7 @@ class LoginVC: UIViewController {
     }
     
     @IBAction func login(sender: AnyObject) {
-        guard let name = userNameField.text , let pw = passwordField.text else { return }
+        guard let name = userNameField.text, let pw = passwordField.text else { return }
         SVProgressHUD.show()
         RequestManager.shared.login(username: name, password: pw) {
             if self.checkCookie() {
@@ -68,7 +68,7 @@ class LoginVC: UIViewController {
     func copyCookiesForEx(overwrite: Bool = true) {
         let exCookies = HTTPCookieStorage.shared.cookies(for: Defaults.URL.exHentai) ?? []
         guard overwrite || exCookies.count == 0 else {return}
-        HTTPCookieStorage.shared.cookies(for: Defaults.URL.eHentai)?.forEach{
+        HTTPCookieStorage.shared.cookies(for: Defaults.URL.eHentai)?.forEach {
             if var properties = $0.properties {
                 properties[HTTPCookiePropertyKey.domain] = ".exhentai.org"
                 if let newCookie = HTTPCookie(properties: properties) {

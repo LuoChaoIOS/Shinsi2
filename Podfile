@@ -1,7 +1,7 @@
 project 'Shinsi2.xcodeproj'
 platform :ios, '10.0'
-use_frameworks!
 inhibit_all_warnings!
+use_modular_headers!
 target 'Shinsi2' do
     pod 'RealmSwift'
     pod 'Alamofire'
@@ -10,4 +10,5 @@ target 'Shinsi2' do
     pod 'SVProgressHUD'
     pod 'Hero'
     pod 'AloeStackView'
+    pod 'SwiftLint'
 end

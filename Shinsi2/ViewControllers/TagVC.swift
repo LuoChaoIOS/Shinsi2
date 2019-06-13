@@ -10,8 +10,8 @@ class TagVC: BaseViewController {
         var tags: [String]
         var sortNumber: Int 
     }
-    var sortedStrings = ["parody","artist","group","character","female","male","misc","language"]
-    var items : [TagItem] = []
+    var sortedStrings = ["parody", "artist", "group", "character", "female", "male", "misc", "language"]
+    var items: [TagItem] = []
     let stackView = AloeStackView()
     private var backGesture: InteractiveBackGesture?
     
@@ -22,18 +22,16 @@ class TagVC: BaseViewController {
         
         let gTag = doujinshi.gdata!.gTag
         let keys = gTag.allProperties().keys
-        for key in keys {
-            if gTag[key].count != 0 {
-                let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
-                items.append(item)
-            }
+        for key in keys where gTag[key].count != 0 {
+            let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
+            items.append(item)
         }
-        items = items.sorted{$0.sortNumber < $1.sortNumber}
+        items = items.sorted {$0.sortNumber < $1.sortNumber}
         
         view.addSubview(stackView)
         stackView.frame = view.bounds
         stackView.separatorInset = .zero
-        stackView.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+        stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         for item in items {
             stackView.addRow(createTitleLable(text: item.title))
@@ -43,7 +41,7 @@ class TagVC: BaseViewController {
                 stackView.addRow(l)
                 stackView.hideSeparator(forRow: l)
                 stackView.setInset(forRow: l, inset: UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15))
-                stackView.setTapHandler(forRow: l) {[weak self] (label) in
+                stackView.setTapHandler(forRow: l) { [weak self] _ in
                     let string = item.title == "misc" ? tag : item.title + ":" + tag
                     self?.clickBlock?(string)
                 }
@@ -51,7 +49,7 @@ class TagVC: BaseViewController {
         }
     }
     
-    func createTitleLable(text:String) -> UILabel {
+    func createTitleLable(text: String) -> UILabel {
         let label = UILabel()
         label.text = text
         label.font = UIFont.boldSystemFont(ofSize: 24)
@@ -59,7 +57,7 @@ class TagVC: BaseViewController {
         return label
     }
     
-    func createTextLable(text:String) -> UILabel {
+    func createTextLable(text: String) -> UILabel {
         let label = UILabel()
         label.text = text
         return label

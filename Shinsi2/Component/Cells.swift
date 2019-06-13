@@ -129,7 +129,7 @@ extension ScrollingImageCell: UIScrollViewDelegate {
 
 extension ScrollingImageCell: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let _ = gestureRecognizer as? UITapGestureRecognizer, let _ = otherGestureRecognizer as? UITapGestureRecognizer else {return false}
+        guard gestureRecognizer as? UITapGestureRecognizer != nil, otherGestureRecognizer as? UITapGestureRecognizer != nil else {return false}
         return true
     }
 }

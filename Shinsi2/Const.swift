@@ -48,7 +48,7 @@ class Defaults {
         static var configEX: Foundation.URL = Foundation.URL(string: kHostExHentai + "/uconfig.php")!
     }
     class Search {
-        static var categories: [String] = ["doujinshi","manga","artistcg","gamecg","western","non-h","imageset","cosplay","asianporn","misc"]
+        static var categories: [String] = ["doujinshi", "manga", "artistcg", "gamecg", "western", "non-h", "imageset", "cosplay", "asianporn", "misc"]
     }
     class List {
         static var isHideTitle: Bool {
@@ -73,7 +73,7 @@ class Defaults {
             set { UserDefaults.standard.set(newValue, forKey: kUDListCellWidth) }
         }
         static var favoriteTitles: [String] {
-            get { return UserDefaults.standard.array(forKey: kUDListFavoriteTitles) as? [String] ?? "0123456789".map{ "Favorites \($0)"}}
+            get { return UserDefaults.standard.array(forKey: kUDListFavoriteTitles) as? [String] ?? "0123456789".map { "Favorites \($0)"}}
             set { UserDefaults.standard.set(newValue, forKey: kUDListFavoriteTitles)}
         }
     }
