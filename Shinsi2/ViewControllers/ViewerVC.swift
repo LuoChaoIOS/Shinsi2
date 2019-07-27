@@ -194,11 +194,26 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         
         //prefetch
         let pageIndex = indexPath.item
+        var count = 0
         for i in 1...5 {
+            //向前加载最多两页
+            if pageIndex - i >= 0 && i < 3 {
+                let p = pageIndex - i
+                if let previousPhoto = doujinshi.pages[p].photo, previousPhoto.underlyingImage == nil {
+                    previousPhoto.loadUnderlyingImageAndNotify()
+                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[p].thumbUrl)!])
+                    count += 1
+                }
+            }
+            //向后加载
             if i + pageIndex > doujinshi.pages.count - 1 { break }
             if let nextPhoto = doujinshi.pages[i + pageIndex].photo, nextPhoto.underlyingImage == nil {
                 nextPhoto.loadUnderlyingImageAndNotify()
                 ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
+                count += 1
+                guard count < 5 else {  //最多加载5页
+                    break
+                }
             }
         }
         

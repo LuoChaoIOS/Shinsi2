@@ -3,6 +3,13 @@ import RealmSwift
 import SDWebImage
 import Alamofire
 
+//下载失败，最大重试三次
+let maxRetries = 3
+//完成后设定下一个任务间隔时间，避免被识别为爬虫？？
+var sleepTime = 1
+//最大线程并发数设为1，避免被识别为爬虫？？
+let maxConcurrentOperationCount = 1
+
 class SSOperation: Operation {
     enum State {
         case ready, executing, finished
@@ -37,6 +44,7 @@ class PageDownloadOperation: SSOperation {
     var url: String
     var folderPath: String
     var pageNumber: Int
+    var retry = 0
 
     init(url: String, folderPath: String, pageNumber: Int) {
         self.url = url
@@ -45,12 +53,14 @@ class PageDownloadOperation: SSOperation {
     }
     
     override func start() {
-        guard !isCancelled else {
+        guard !isCancelled && retry < maxRetries else {
             state = .finished
             return
         }
+        retry += 1
         state = .executing
         main()
+        print("start count = \(self.retry)")
     }
     
     override func main() {
@@ -61,13 +71,19 @@ class PageDownloadOperation: SSOperation {
                 let destination: DownloadRequest.DownloadFileDestination = { _, _ in
                     return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
                 }
-                Alamofire.download(imageUrl, to: destination).response { _ in
-                    self.state = .finished
-                    if let image = UIImage(contentsOfFile: fileURL.path) {
-                        SDWebImageManager.shared().imageCache?.store(image, forKey: imageUrl, completion: nil)
-                    }
-                    if self.isCancelled {
-                        try? FileManager.default.removeItem(at: documentsURL)
+                //异步下载，并设定下载间隔时长
+                let queue = DispatchQueue(label: "asyncQueue")
+                queue.asyncAfter(wallDeadline: .now() + DispatchTimeInterval.seconds(sleepTime)) {
+                    Alamofire.download(imageUrl, to: destination).response { _ in
+                        self.state = .finished
+                        if let image = UIImage(contentsOfFile: fileURL.path) {
+                            SDWebImageManager.shared.imageCache.store(image, imageData: image.sd_imageData(), forKey: imageUrl, cacheType: .all, completion: nil)
+                        } else {
+                            self.start()
+                        }
+                        if self.isCancelled {
+                            try? FileManager.default.removeItem(at: documentsURL)
+                        }
                     }
                 }
             } else {
@@ -88,7 +104,7 @@ class DownloadManager: NSObject {
         let path = documentURL.appendingPathComponent(folderName).path
         
         let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 3
+        queue.maxConcurrentOperationCount = maxConcurrentOperationCount
         queue.isSuspended = queues.count != 0
         queue.name = gdata.gid
         queues.append(queue)

@@ -14,6 +14,9 @@ let isSizeClassRegular = kHorizontalSizeClass == .regular && kVerticalSizeClass 
 
 //User default
 let kUDHost = "kUDHost"
+let kUDIsMinimumRating = "kUDIsMinimumRating"
+let kUDMinimumRating = "kUDMinimumRating"
+let kUDMaxCacheSize = "kUDMaxCacheSize"
 
 let kUDListCellWidth = "kUDListCellWidth"
 let kUDListLastSearchKeyword = "kUDListLastSearchKeyword"
@@ -49,6 +52,17 @@ class Defaults {
     }
     class Search {
         static var categories: [String] = ["doujinshi", "manga", "artistcg", "gamecg", "western", "non-h", "imageset", "cosplay", "asianporn", "misc"]
+        static var isMinimumRating: Bool {
+            get {  return UserDefaults.standard.bool(forKey: kUDIsMinimumRating) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDIsMinimumRating)}
+        }
+        static var minimumRating: Int {
+            get {
+                let rating = UserDefaults.standard.integer(forKey: kUDMinimumRating)
+                return rating > 0 ? rating : 2
+            }
+            set { UserDefaults.standard.set(newValue, forKey: kUDMinimumRating) }
+        }
     }
     class List {
         static var isHideTitle: Bool {
@@ -100,6 +114,13 @@ class Defaults {
         static var mode: ViewerVC.ViewerMode {
             get { return ViewerVC.ViewerMode(rawValue: UserDefaults.standard.integer(forKey: kUDViewerMode))! }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: kUDViewerMode) }
+        }
+    }
+    
+    class Cache {
+        static var maxCacheSize: Int {
+            get { return UserDefaults.standard.integer(forKey: kUDMaxCacheSize) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDMaxCacheSize)}
         }
     }
     

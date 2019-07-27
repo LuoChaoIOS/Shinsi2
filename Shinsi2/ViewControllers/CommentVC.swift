@@ -2,6 +2,7 @@ import UIKit
 
 protocol CommentVCDelegate: class {
     func commentVC(_ vc: CommentVC, didTap url: URL)
+    func commentVC(_ vc: CommentVC, didTap author: String)
 }
 
 class CommentVC: BaseViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
@@ -27,15 +28,25 @@ class CommentVC: BaseViewController, UITableViewDelegate, UITableViewDataSource,
         let df = DateFormatter()
         df.dateFormat = "yyyy/MM/dd HH:mm"
         cell.dateLabel.text = df.string(from: c.date)
-        cell.authorLabel.text = c.author
-        cell.commentTextView.attributedText = c.htmlAttributedText
+        //给名字加下划线
+        //cell.authorButton.setTitle(c.author, for: .normal)
+        let attributes: [NSAttributedString.Key: Any] = [ .underlineStyle: NSUnderlineStyle.single.rawValue ]
+        let attriTitle = NSAttributedString(string: c.author, attributes: attributes)
+        cell.authorButton.setAttributedTitle(attriTitle, for: .normal)
         
+        cell.commentTextView.attributedText = c.htmlAttributedText
+        cell.authorTouched = authorTouched
         return cell
     }
     
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         delegate?.commentVC(self, didTap: URL)
         return false
+    }
+    
+    @objc private func authorTouched(_ author: String) {
+        let string = "uploader:" + author
+        delegate?.commentVC(self, didTap: string)
     }
 
 }

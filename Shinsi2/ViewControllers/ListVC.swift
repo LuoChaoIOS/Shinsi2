@@ -44,7 +44,14 @@ class ListVC: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "title_icon"))
+
+        //顶部logo由图片改为按钮，点击后显示当前热门 Popular
+        //navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "title_icon"))
+        let btn = UIButton()
+        btn.setImage(#imageLiteral(resourceName: "title_icon"), for: .normal)
+        btn.addTarget(self, action: #selector(showPopular), for: .touchUpInside)
+        navigationItem.titleView = btn
+        
         if traitCollection.forceTouchCapability == .available {
             registerForPreviewing(with: self, sourceView: collectionView)
         }
@@ -201,6 +208,12 @@ class ListVC: BaseViewController {
             searchController.dismiss(animated: false, completion: nil)
         }
         reloadData()
+    }
+    
+    @objc func showPopular() {
+        guard navigationController?.presentedViewController == nil else {return}
+        self.showSearch(with: "popular")
+        Defaults.List.lastSearchKeyword = self.searchController.searchBar.text ?? ""
     }
 
     @objc func longPress(ges: UILongPressGestureRecognizer) {

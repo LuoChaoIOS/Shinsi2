@@ -309,6 +309,14 @@ class GalleryVC: BaseViewController {
 }
 
 extension GalleryVC: CommentVCDelegate {
+    func commentVC(_ vc: CommentVC, didTap author: String) {
+        vc.dismiss(animated: true) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                self.pushToListVC(with: author)
+            })
+        }
+    }
+    
     func commentVC(_ vc: CommentVC, didTap url: URL) {
         if url.absoluteString.contains(Defaults.URL.host) {
             if url.absoluteString.contains(Defaults.URL.host+"/g/"), url.absoluteString != doujinshi.url {

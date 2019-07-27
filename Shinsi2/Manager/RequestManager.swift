@@ -10,8 +10,16 @@ class RequestManager {
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
         var url = Defaults.URL.host + "/?"
         url += "\(categoryFilters)&f_apply=Apply+Filter" //Apply category filters
-        url += "&advsearch=1&f_sname=on&f_stags=on&f_sh=on&f_srdd=2" //Advance search
+        url += "&advsearch=1&f_sname=on&f_stags=on&f_sdesc=on&f_storr=on&f_sh=on" //Advance search  f_storr种子名称 f_sdesc画廊描述
+        //Minimum Rating 最低评分
+        if  Defaults.Search.isMinimumRating {
+            url += "&f_sr=on&f_srdd=\(Defaults.Search.minimumRating)"
+        }
         url += "&inline_set=dm_t" //Set mode to Thumbnail View
+        
+        //https://e-hentai.org/?f_search=naru&advsearch=1&f_spf=&f_spt=
+        //https://e-hentai.org/?f_search=naru&advsearch=1&f_sname=on&f_spf=&f_spt=
+        //https://e-hentai.org/?f_search=naru&advsearch=1&f_sdt1=on&f_spf=&f_spt=
         
         var cacheFavoritesTitles = false
         if var keyword = keyword {
@@ -54,10 +62,29 @@ class RequestManager {
             guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 var items: [Doujinshi] = []
-                for link in doc.xpath("//div [@class='gl3t'] //a") {
-                    if let url = link["href"], let imgNode = link.at_css("img"), let imgUrl = imgNode["src"], let title = imgNode["title"] {
-                        items.append(Doujinshi(value: ["coverUrl": imgUrl, "title": title, "url": url]))
+//                for link in doc.xpath("//div [@class='gl3t'] //a") {
+//                    if let url = link["href"], let imgNode = link.at_css("img"), let imgUrl = imgNode["src"], let title = imgNode["title"] {
+//                for link in doc.xpath("//div [@class='gl1t']") {
+//                    if let url = link.xpath("div[1] //a").first?["href"], let imgUrl = link.xpath("div[1] //a //img").first?["src"] , let title = link.xpath("a[1] //div").first?.text  {
+//                        items.append(Doujinshi(value: ["coverUrl": imgUrl, "title": title, "url": url]))
+//                    }
+//                }
+                for link in doc.xpath("//div [@class='gl1t']") {
+                    
+                    var imageUrl: String?
+                    var title: String?
+                    var url: String?
+                    
+                    if keyword?.contains("favorites") ?? false {
+                        url = link.xpath("div[1] //a").first?["href"]
+                        imageUrl = link.xpath("div[2] //a //img").first?["src"]
+                        title = link.xpath("div[1] //div //a //span").first?.text
+                    } else {
+                        imageUrl = link.xpath("div[1] //a //img").first?["src"]
+                        title = link.xpath("a[1] //div").first?.text
+                        url = link.xpath("div[1] //a").first?["href"]
                     }
+                    items.append(Doujinshi(value: ["coverUrl": imageUrl ?? "", "title": title ?? "", "url": url ?? ""]))
                 }
                 block?(items)
                 if cacheFavoritesTitles {
@@ -76,6 +103,9 @@ class RequestManager {
         print(#function)
         var url = doujinshi.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
+        if page == 0 {
+            url += "&hc=1#comments" //显示所有评论 &hc=1#comments
+        }
         Alamofire.request(url, method: .get).responseString { response in
             guard let html = response.result.value else {
                 block?([])
@@ -178,8 +208,9 @@ class RequestManager {
                             let title_jpn = metadata["title_jpn"] as? String,
                             let tags = metadata["tags"] as? [String],
                             let thumb = metadata["thumb"] as? String,
+                            let uploader = metadata["uploader"] as? String,
                             let gid = metadata["gid"] as? Int {
-                            let gdata = GData(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid)])
+                            let gdata = GData(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid), "uploader": uploader])
                             for t in tags {
                                 gdata.tags.append(Tag(value: ["name": t]))
                             }

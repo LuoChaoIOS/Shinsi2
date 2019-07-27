@@ -17,9 +17,15 @@ class ListCell: ImageCell {
 }
 
 class CommentCell: UITableViewCell {
-    @IBOutlet weak var authorLabel: UILabel!
+    @IBOutlet weak var authorButton: UIButton!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var commentTextView: UITextView!
+    @IBAction func touchAuthorButton(_ sender: Any) {
+        if let author = authorButton.attributedTitle(for: .normal)?.string {
+            authorTouched?(author)
+        }
+    }
+    var authorTouched: ((_ author: String) -> Void)?
 }
 
 class ScrollingImageCell: UICollectionViewCell { 

@@ -63,6 +63,17 @@ class SettingVC: BaseViewController {
             }
         })
         
+        // MinimumRating
+        let minimunRatingLabel = createSubTitleLabel("Minimum Rating")
+        let minimunRatingSwitch = UISwitch()
+        minimunRatingSwitch.isOn = Defaults.Search.isMinimumRating
+        minimunRatingSwitch.addTarget(self, action: #selector(filterMinimunRatingSwitchVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(createStackView([minimunRatingLabel, minimunRatingSwitch]))
+        let minimumRatingSeg = UISegmentedControl(items: ["2🌟", "3🌟", "4🌟", "5🌟"])
+        minimumRatingSeg.selectedSegmentIndex = Defaults.Search.minimumRating - 2
+        minimumRatingSeg.addTarget(self, action: #selector(filterMinimunRatingSegmentedControlVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(minimumRatingSeg)
+        
         // Settings
         addTitle("My Settings")
         
@@ -126,10 +137,18 @@ class SettingVC: BaseViewController {
         
         //Cache+
         addTitle("Cache")
+        
+        addSubTitle("Max CacheSize")
+        let cacheSizeSeg = UISegmentedControl(items: ["Unlimited", "1GB", "2GB", "4GB"])
+        let index = Defaults.Cache.maxCacheSize < 4096 ? Defaults.Cache.maxCacheSize / 1024 : 3
+        cacheSizeSeg.selectedSegmentIndex = index
+        cacheSizeSeg.addTarget(self, action: #selector(cacheSizeSegmentedControlVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(cacheSizeSeg)
+        
         let cacheSizeLable = createSubTitleLabel("size: counting...")
         stackView.addRow(cacheSizeLable)
         DispatchQueue.global(qos: .background).async {
-            let cacheSize = Double(SDImageCache.shared().getSize()) / 1024 / 1024
+            let cacheSize = Double(SDImageCache.shared.totalDiskSize()) / 1024 / 1024
             DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
                 guard let self = self, let cacheSizeLable = cacheSizeLable else {return}
                 cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
@@ -142,7 +161,7 @@ class SettingVC: BaseViewController {
                 self.stackView.insertRow(clear, after: cacheSizeLable)
                 self.stackView.setTapHandler(forRow: clear) { _ in
                     SVProgressHUD.show()
-                    SDImageCache.shared().clearDisk(onCompletion: {
+                    SDImageCache.shared.clearDisk(onCompletion: {
                         SVProgressHUD.showSuccess(withStatus: "Deleted")
                     })
                 }
@@ -214,6 +233,21 @@ class SettingVC: BaseViewController {
     
     @objc func viewerModeSegmentedControlVauleChanged(sender: UISegmentedControl) {
         Defaults.Viewer.mode = sender.selectedSegmentIndex == 0 ? .horizontal : .vertical
+    }
+    
+    @objc func filterMinimunRatingSegmentedControlVauleChanged(sender: UISegmentedControl) {
+        Defaults.Search.minimumRating = sender.selectedSegmentIndex + 2
+    }
+    
+    @objc func filterMinimunRatingSwitchVauleChanged(sender: UISwitch) {
+        Defaults.Search.isMinimumRating = sender.isOn
+    }
+    
+    @objc func cacheSizeSegmentedControlVauleChanged(sender: UISegmentedControl) {
+        let gbSize = sender.selectedSegmentIndex < 3 ? sender.selectedSegmentIndex : 4
+        Defaults.Cache.maxCacheSize = gbSize * 1024
+        //maxCacheSize
+        SDImageCache.shared.config.maxDiskSize = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)
     }
     
     func presentWebViewController(url: URL) {

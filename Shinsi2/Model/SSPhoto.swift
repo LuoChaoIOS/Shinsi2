@@ -10,7 +10,7 @@ class SSPhoto: NSObject {
     var underlyingImage: UIImage?
     var urlString: String
     var isLoading = false
-    let imageCache = SDWebImageManager.shared().imageCache!
+    let imageCache = SDWebImageManager.shared.imageCache
     
     init(URL url: String) {
         urlString = url
@@ -20,32 +20,27 @@ class SSPhoto: NSObject {
     func loadUnderlyingImageAndNotify() {
         guard isLoading == false, underlyingImage == nil else { return } 
         isLoading = true
-        
         RequestManager.shared.getPageImageUrl(url: urlString) { [weak self] url in
             guard let self = self else { return }
             guard let url = url else {
                 self.imageLoadComplete()
                 return
             }
-            SDWebImageDownloader.shared().downloadImage( with: URL(string: url)!, options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil, completed: { [weak self] image, _, _, _ in
+            SDWebImageDownloader.shared.downloadImage(with: URL(string: url)!, options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil, completed: { [weak self] (image, data, _, _) in
                 guard let self = self else { return }
-                self.imageCache.store(image, forKey: self.urlString)
+                self.imageCache.store(image, imageData: data, forKey: self.urlString, cacheType: .all)
                 self.underlyingImage = image
                 DispatchQueue.main.async {
+                    print("下载完成" + self.urlString)
                     self.imageLoadComplete()
                 }
             })
         }
+        
     }
 
     func checkCache() {
-        if let memoryCache = imageCache.imageFromMemoryCache(forKey: urlString) {
-            underlyingImage = memoryCache
-            imageLoadComplete()
-            return
-        }
-        
-        imageCache.queryCacheOperation(forKey: urlString) { [weak self] image, _, _ in
+        imageCache.queryImage(forKey: urlString, options: [.highPriority], context: nil) { [weak self] (image, _, _) in
             if let diskCache = image, let self = self {
                 self.underlyingImage = diskCache
                 self.imageLoadComplete()

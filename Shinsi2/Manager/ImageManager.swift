@@ -3,11 +3,15 @@ import SDWebImage
 
 class ImageManager {
     static let shared: ImageManager = ImageManager()
-    let imageCache = SDWebImageManager.shared().imageCache!
+    let imageCache = SDWebImageManager.shared.imageCache
     private var downloadingUrls: Set<URL> = Set<URL>()
     
     func getCache(forKey name: String) -> UIImage? {
-        return imageCache.imageFromMemoryCache(forKey: name) ?? imageCache.imageFromDiskCache(forKey: name)
+        var cimage: UIImage?
+        imageCache.queryImage(forKey: name, options: [.highPriority], context: nil) { (image, _, _) in
+            cimage = image
+        }
+        return cimage
     }
     
     func prefetch(urls: [URL]) {

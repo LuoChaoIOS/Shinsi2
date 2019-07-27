@@ -12,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setDefaultAppearance()
         setDefaultHudAppearance()
         Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
-        
+        SDImageCache.shared.config.maxDiskSize = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)     //maxCacheSize
         #if DEBUG
         //RealmManager.shared.deleteSearchHistory()
         //SDImageCache.shared().clearMemory()
@@ -35,7 +35,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setMinimumSize(CGSize(width: 120, height: 120))
         SVProgressHUD.setForegroundColor(window?.tintColor ?? #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1))
         SVProgressHUD.setDefaultMaskType(.black)
-        SVProgressHUD.setMinimumDismissTimeInterval(3)
+        SVProgressHUD.setMinimumDismissTimeInterval(1)
         SVProgressHUD.setImageViewSize(CGSize(width: 44, height: 44))
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        SecurityHelper.Instance.hiddenSecurityBackground()
+    }
+    
+    func applicationWillResignActive(_ application: UIApplication) {
+        SecurityHelper.Instance.showSecurityBackground()
     }
 }

@@ -33,6 +33,7 @@ class TagVC: BaseViewController {
         stackView.separatorInset = .zero
         stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
+        //add tags
         for item in items {
             stackView.addRow(createTitleLable(text: item.title))
             for tag in item.tags {
@@ -47,6 +48,22 @@ class TagVC: BaseViewController {
                 }
             }
         }
+        
+        // add uploader
+        let uploader = doujinshi.gdata!.uploader
+        if uploader.count > 0 {
+            stackView.addRow(createTitleLable(text: "uploader"))
+            let l = createTextLable(text: doujinshi.gdata!.uploader)
+            l.isUserInteractionEnabled = true
+            stackView.addRow(l)
+            stackView.hideSeparator(forRow: l)
+            stackView.setInset(forRow: l, inset: UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15))
+            stackView.setTapHandler(forRow: l) { [weak self] _ in
+                let string = "uploader:" + uploader
+                self?.clickBlock?(string)
+            }
+        }
+        
     }
     
     func createTitleLable(text: String) -> UILabel {

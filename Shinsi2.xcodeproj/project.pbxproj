@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		436634B722E9689B00B5278C /* SecurityHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436634B622E9689B00B5278C /* SecurityHelper.swift */; };
+		436634C122E96E4D00B5278C /* SecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436634C022E96E4D00B5278C /* SecurityView.swift */; };
+		436634C322E9909300B5278C /* SecurityView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 436634C222E9909200B5278C /* SecurityView.xib */; };
 		540D1FED20DA3EB60044EC55 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540D1FEC20DA3EB60044EC55 /* InsetLabel.swift */; };
 		542362F521940916004619F3 /* BsaeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542362F421940916004619F3 /* BsaeViewController.swift */; };
 		542362F721945C49004619F3 /* WebVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542362F621945C49004619F3 /* WebVC.swift */; };
@@ -39,6 +42,9 @@
 
 /* Begin PBXFileReference section */
 		07CE087BB77CAC2F3F8A5D79 /* Pods-Shinsi2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shinsi2.release.xcconfig"; path = "Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2.release.xcconfig"; sourceTree = "<group>"; };
+		436634B622E9689B00B5278C /* SecurityHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityHelper.swift; sourceTree = "<group>"; };
+		436634C022E96E4D00B5278C /* SecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityView.swift; sourceTree = "<group>"; };
+		436634C222E9909200B5278C /* SecurityView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SecurityView.xib; sourceTree = "<group>"; };
 		540D1FEC20DA3EB60044EC55 /* InsetLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		542362F421940916004619F3 /* BsaeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BsaeViewController.swift; sourceTree = "<group>"; };
 		542362F621945C49004619F3 /* WebVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebVC.swift; sourceTree = "<group>"; };
@@ -126,6 +132,7 @@
 				5466636C1F1DE3B8003B9E36 /* AppDelegate.swift */,
 				546663811F1DE44D003B9E36 /* Const.swift */,
 				5466637F1F1DE44D003B9E36 /* Helper.swift */,
+				436634B622E9689B00B5278C /* SecurityHelper.swift */,
 				546663821F1DE44D003B9E36 /* ViewControllers */,
 				549F14FF21904A790084810D /* Component */,
 				549F150021904AB00084810D /* Manager */,
@@ -162,6 +169,8 @@
 				54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */,
 				54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */,
 				54405C912196888F00D613BD /* LoadingView.swift */,
+				436634C022E96E4D00B5278C /* SecurityView.swift */,
+				436634C222E9909200B5278C /* SecurityView.xib */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -248,6 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				436634C322E9909300B5278C /* SecurityView.xib in Resources */,
 				546663771F1DE3B8003B9E36 /* LaunchScreen.storyboard in Resources */,
 				546663741F1DE3B8003B9E36 /* Assets.xcassets in Resources */,
 				546663721F1DE3B8003B9E36 /* Main.storyboard in Resources */,
@@ -298,7 +308,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Shinsi2/Pods-Shinsi2-resources.sh",
 				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -307,7 +317,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Shinsi2/Pods-Shinsi2-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -322,6 +332,7 @@
 				547AF17C20DE4538003D2AF3 /* ImageManager.swift in Sources */,
 				546663931F1DE511003B9E36 /* SettingVC.swift in Sources */,
 				546663941F1DE511003B9E36 /* TagVC.swift in Sources */,
+				436634B722E9689B00B5278C /* SecurityHelper.swift in Sources */,
 				546663901F1DE511003B9E36 /* ListVC.swift in Sources */,
 				54433ECA21992FA1008313D4 /* CommentVC.swift in Sources */,
 				54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */,
@@ -332,6 +343,7 @@
 				540D1FED20DA3EB60044EC55 /* InsetLabel.swift in Sources */,
 				54AA5F482192B03C003E0FAD /* QuickScrollBar.swift in Sources */,
 				5466639C1F1DE67B003B9E36 /* RealmManager.swift in Sources */,
+				436634C122E96E4D00B5278C /* SecurityView.swift in Sources */,
 				546663971F1DE511003B9E36 /* DownloadManager.swift in Sources */,
 				5466638D1F1DE509003B9E36 /* RequestManager.swift in Sources */,
 				546663961F1DE511003B9E36 /* Cells.swift in Sources */,
@@ -482,10 +494,10 @@
 			baseConfigurationReference = 84200A16D7CCE139324C1CC5 /* Pods-Shinsi2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 2DM9265XNV;
+				DEVELOPMENT_TEAM = 69TB4AKJG9;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.moriran.Shinsi2;
+				PRODUCT_BUNDLE_IDENTIFIER = Shinsi2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -497,10 +509,10 @@
 			baseConfigurationReference = 07CE087BB77CAC2F3F8A5D79 /* Pods-Shinsi2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 2DM9265XNV;
+				DEVELOPMENT_TEAM = 69TB4AKJG9;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.moriran.Shinsi2;
+				PRODUCT_BUNDLE_IDENTIFIER = Shinsi2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
