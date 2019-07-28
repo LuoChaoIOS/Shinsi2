@@ -6,7 +6,7 @@ target 'Shinsi2' do
     pod 'RealmSwift'
     pod 'Alamofire'
     pod 'Kanna'
-    pod 'SDWebImage'
+    pod 'Kingfisher'
     pod 'SVProgressHUD'
     pod 'Hero'
     pod 'AloeStackView'

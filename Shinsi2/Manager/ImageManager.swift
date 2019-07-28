@@ -1,38 +1,37 @@
 import UIKit
-import SDWebImage
+import Kingfisher
 
 class ImageManager {
     static let shared: ImageManager = ImageManager()
-    let imageCache = SDWebImageManager.shared.imageCache
+    let imageCache = KingfisherManager.shared.cache
     private var downloadingUrls: Set<URL> = Set<URL>()
     
-    func getLowQualityCache(forKey name: String) -> UIImage? {
-        let cimage = getCache(forKey: name)
-        return cimage?.sd_imageFormat == .GIF ? cimage?.compressImageOnlength(maxLength: 1024 * 1024) : cimage
-    }
-    
-    func getCache(forKey name: String) -> UIImage? {
-        var cimage: UIImage?
-        imageCache.queryImage(forKey: name, options: [.highPriority], context: nil) { (image, _, _) in
-            cimage = image
+    func getCache(forKey name: String, complete: @escaping ((_ image: UIImage?) -> Void)) {
+        imageCache.retrieveImage(forKey: name, options: nil, callbackQueue: .mainAsync) { (result) in
+            switch result {
+            case .success(let value):
+                complete(value.image)
+            case .failure(let error):
+                print(error)
+                complete(nil)
+            }
         }
-        return cimage
     }
     
     func prefetch(urls: [URL]) {
         var prefetchUrls: [URL] = []
         for url in urls {
             guard !downloadingUrls.contains(url) else {return}
-            guard getCache(forKey: url.absoluteString) == nil else {return}
-            downloadingUrls.insert(url)
+            self.downloadingUrls.insert(url)
             prefetchUrls.append(url)
         }
-        
-        let prefetcher = SDWebImagePrefetcher()
-        prefetcher.options = [.highPriority, .handleCookies]
-        prefetcher.prefetchURLs(urls, progress: nil) { (_, _) in
-            prefetchUrls.forEach { self.downloadingUrls.remove($0) }
+        let prefetcher = ImagePrefetcher(
+        urls: prefetchUrls,
+        options: [.cacheOriginalImage],
+        progressBlock: nil) { (_, _, _) in
+            prefetchUrls.forEach { self.downloadingUrls.remove($0.downloadURL) }
         }
+        prefetcher.start()
         
     }
 }

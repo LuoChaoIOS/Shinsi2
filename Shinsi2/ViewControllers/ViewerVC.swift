@@ -1,7 +1,7 @@
 import UIKit
 import Hero
-import SDWebImage
 import Photos
+import Kingfisher
 
 class ViewerVC: UICollectionViewController {
     
@@ -175,20 +175,29 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
             print("return willDisplay = \(indexPath.item)")
             return
         }
-        let page = getPage(for: indexPath)
-        if let cell = cell as? ScrollingImageCell {
-            if doujinshi.isDownloaded {
-                if page.localImage?.sd_imageFormat == .GIF {
-                    DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
-                        cell.image = page.localImage
-                    }
-                }
-            } else if let photo = page.photo, let image = photo.underlyingImage, image.sd_imageFormat == .GIF {
-                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
-                    cell.image = image
-                }
-            }
-        }
+//        let page  = getPage(for: indexPath)
+//        if let cell = cell as? ScrollingImageCell {
+//            if let photo = page.photo, let image = photo.underlyingImage {
+//                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
+//                    cell.imageView.image = image
+//                }
+//            }
+//        }
+
+        
+//        if let cell = cell as? ScrollingImageCell {
+//            if doujinshi.isDownloaded {
+//                if page.localImage?.sd_imageFormat == .GIF {
+//                    DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
+//                        cell.image = page.localImage
+//                    }
+//                }
+//            } else if let photo = page.photo, let image = photo.underlyingImage, image.sd_imageFormat == .GIF {
+//                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
+//                    cell.image = image
+//                }
+//            }
+//        }
         
     }
     
@@ -198,26 +207,33 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         
-        let page = getPage(for: indexPath)
-        if doujinshi.isDownloaded {
-            cell.image = page.lowQualityImage
-        } else {
-            let photo = page.photo!
-            if let image = photo.lowQualityImage {
-                cell.image = image
-            } else {
-                if let image = ImageManager.shared.getCache(forKey: page.thumbUrl) {
-                    cell.image = image
-                } else {
-                    cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
-                } 
-                photo.loadUnderlyingImageAndNotify()
-            }
-        }
-        
         if indexPath.item == 0 && selectedIndexPath != indexPath && selectedIndexPath?.item != 1 {  //解决每次重新点进时调用一次0位置的问题，减少资源占用
             print("return cellForItemAt = \(indexPath.item)")
             return cell
+        }
+        
+        let page = getPage(for: indexPath)
+        if doujinshi.isDownloaded {
+            if let image = page.localImage {
+                cell.image = image
+            } else {    //如果没有下载
+                ImageManager.shared.getCache(forKey: page.url) { (image) in
+                    if let image = image {
+                        cell.image = image
+                    } else if let photo = page.photo {
+                        photo.loadUnderlyingImageAndNotify()
+                    }
+                }
+            }
+        } else {
+            let photo = page.photo!
+            if let image = photo.underlyingImage {
+                cell.image = image
+            } else {
+                let resource = ImageResource(downloadURL: URL(string: page.thumbUrl)!, cacheKey: page.thumbUrl)
+                cell.imageView.kf.setImage(with: resource)
+                photo.loadUnderlyingImageAndNotify()
+            }
         }
         
         //prefetch
@@ -284,11 +300,13 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     }
     
     func reloadVisibleCell(photo: SSPhoto) {
-        for indexPath in collectionView!.indexPathsForVisibleItems {
-            let page = getPage(for: indexPath)
-            if page.photo.urlString == photo.urlString, let image = photo.underlyingImage, let cell = collectionView?.cellForItem(at: indexPath) as? ScrollingImageCell {
-                cell.image = image
-                break
+        DispatchQueue.main.async {
+            for indexPath in self.collectionView!.indexPathsForVisibleItems {
+                let page = self.getPage(for: indexPath)
+                if page.photo.urlString == photo.urlString, let image = photo.underlyingImage, let cell = self.collectionView?.cellForItem(at: indexPath) as? ScrollingImageCell {
+                    cell.image = image
+                    break
+                }
             }
         }
     }

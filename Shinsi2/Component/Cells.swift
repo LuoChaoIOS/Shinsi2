@@ -1,12 +1,12 @@
 import UIKit
-import SDWebImage
+import Kingfisher
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var  loadingView: LoadingView?
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageView.sd_cancelCurrentImageLoad()
+        imageView.kf.cancelDownloadTask()
     }
 }
 
@@ -29,7 +29,7 @@ class CommentCell: UITableViewCell {
 }
 
 class ScrollingImageCell: UICollectionViewCell { 
-    var imageView: UIImageView = UIImageView()
+    var imageView: AnimatedImageView = AnimatedImageView()
     var scrollView: UIScrollView = UIScrollView()
     var dTapGR: UITapGestureRecognizer!
     var image: UIImage? {
@@ -104,7 +104,7 @@ class ScrollingImageCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         scrollView.setZoomScale(1, animated: false)
-        imageView.sd_cancelCurrentImageLoad()
+        imageView.kf.cancelDownloadTask()
     }
     
     func centerIfNeeded() {

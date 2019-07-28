@@ -1,8 +1,8 @@
 import UIKit
 import Hero
-import SDWebImage
 import SVProgressHUD
 import SafariServices
+import Kingfisher
 
 class GalleryVC: BaseViewController {
     var doujinshi: Doujinshi!
@@ -374,15 +374,26 @@ UICollectionViewDataSourcePrefetching {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = doujinshi.pages[indexPath.item]
         if doujinshi.isDownloaded {
-            cell.imageView.image = page.lowQualityImage
-            cell.loadingView?.hide(animated: false)
-        } else {
-            if let image = ImageManager.shared.getLowQualityCache(forKey: page.url) {
-                cell.imageView.image = image
+            if let image = page.localImage {
+                cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)
                 cell.loadingView?.hide(animated: false)
-            } else {
-                cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
-                cell.loadingView?.show(animated: false)
+            } else {    //如果没有下载
+                ImageManager.shared.getCache(forKey: page.url) { (image) in
+                    if let image = image {
+                        cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)
+                        cell.loadingView?.hide(animated: false)
+                    }
+                }
+            }
+        } else {
+            let resource = ImageResource(downloadURL: URL(string: page.thumbUrl)!, cacheKey: page.thumbUrl)
+            cell.imageView.kf.setImage(with: resource)
+            cell.loadingView?.show(animated: false)
+            ImageManager.shared.getCache(forKey: page.url) { (image) in
+                if let image = image {
+                    cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)
+                    cell.loadingView?.hide(animated: false)
+                }
             }
         }
         cell.imageView.hero.id = "image_\(doujinshi.id)_\(indexPath.item)"

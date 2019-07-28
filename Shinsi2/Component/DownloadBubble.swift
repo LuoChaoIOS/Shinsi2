@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 class DownloadBubble: UIView {
     static let shared = DownloadBubble()
@@ -141,7 +142,9 @@ class DownloadBubble: UIView {
     
     func observerNextQueue() {
         if let queue = DownloadManager.shared.queues.first, let doujinshi = DownloadManager.shared.books[queue.name!] {
-            imageView.sd_setImage(with: URL(string: doujinshi.coverUrl), placeholderImage: nil, options: [.handleCookies])
+            let resource = ImageResource(downloadURL: URL(string: doujinshi.coverUrl)!, cacheKey: doujinshi.coverUrl)
+            imageView.kf.setImage(with: resource)
+            
             observingQueue = queue
             queue.addObserver(self, forKeyPath: "operationCount", options: [.new], context: nil)
             updateBadge()

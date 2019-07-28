@@ -1,7 +1,7 @@
 import Foundation
 import RealmSwift
-import SDWebImage
 import Alamofire
+import Kingfisher
 
 //下载失败，最大重试三次
 let maxRetries = 3
@@ -74,13 +74,18 @@ class PageDownloadOperation: SSOperation {
                 //异步下载，并设定下载间隔时长
                 let queue = DispatchQueue(label: "asyncQueue")
                 queue.asyncAfter(wallDeadline: .now() + DispatchTimeInterval.seconds(sleepTime)) {
+                    
                     Alamofire.download(imageUrl, to: destination).response { _ in
                         self.state = .finished
-                        if let image = UIImage(contentsOfFile: fileURL.path) {
-                            SDWebImageManager.shared.imageCache.store(image, imageData: image.sd_imageData(), forKey: imageUrl, cacheType: .all, completion: nil)
-                        } else {
+                        do {
+                            let data = try Data(contentsOf: fileURL)
+                            KingfisherManager.shared.cache.storeToDisk(data, forKey: imageUrl)
+                            print("storeToDisk success = " + imageUrl)
+                        } catch {
+                            print("download failed restart")
                             self.start()
                         }
+                        
                         if self.isCancelled {
                             try? FileManager.default.removeItem(at: documentsURL)
                         }
@@ -97,6 +102,11 @@ class DownloadManager: NSObject {
     static let shared = DownloadManager()
     var queues: [OperationQueue] = []
     var books: [String: Doujinshi] = [:]
+    
+    //待完善
+    func downloadOnePage(doujinshi: Doujinshi!, page: Page!) {
+        
+    }
     
     func download(doujinshi: Doujinshi!) {
         guard let gdata = doujinshi.gdata, doujinshi.pages.count != 0 else {return}

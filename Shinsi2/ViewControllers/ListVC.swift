@@ -1,7 +1,7 @@
 import UIKit
-import SDWebImage
 import RealmSwift
 import SVProgressHUD
+import Kingfisher
 
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -321,10 +321,19 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
                 cell.imageView.contentMode = image.preferContentMode
             }
         } else {
-            cell.imageView.sd_setImage(with: URL(string: doujinshi.coverUrl), placeholderImage: nil, options: [.handleCookies], completed: { (image, _, _, _) in
-                guard let image = image else {return}
-                cell.imageView.contentMode = image.preferContentMode
-            })
+            let resource = ImageResource(downloadURL: URL(string: doujinshi.coverUrl)!, cacheKey: doujinshi.coverUrl)
+            cell.imageView.kf.setImage(
+                with: resource,
+                placeholder: nil,
+                options: [.cacheOriginalImage],
+                progressBlock: nil) { (result) in
+                    switch result {
+                    case .success(let value):
+                        cell.imageView.contentMode = value.image.preferContentMode
+                    case .failure(let error):
+                        print(error)
+                    }
+            }
         }
         
         if let language = doujinshi.title.language {

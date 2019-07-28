@@ -1,5 +1,5 @@
 import Foundation
-import SDWebImage
+import Kingfisher
 
 public extension Notification.Name {
     static let photoLoaded = Notification.Name("SSPHOTO_LOADING_DID_END_NOTIFICATION")
@@ -8,12 +8,10 @@ public extension Notification.Name {
 class SSPhoto: NSObject {
     
     var underlyingImage: UIImage?
-    var lowQualityImage: UIImage? {
-        return underlyingImage?.sd_imageFormat == .GIF ? underlyingImage?.compressImageOnlength(maxLength: 1024 * 1024) : underlyingImage
-    }
     var urlString: String
     var isLoading = false
-    let imageCache = SDWebImageManager.shared.imageCache
+    let imageCache = KingfisherManager.shared.cache
+    var imageUrl: String?
     
     init(URL url: String) {
         urlString = url
@@ -21,32 +19,54 @@ class SSPhoto: NSObject {
     }
 
     func loadUnderlyingImageAndNotify() {
-        guard isLoading == false, underlyingImage == nil else { return } 
+        guard isLoading == false, underlyingImage == nil else { return }
         isLoading = true
+        if imageUrl != nil {
+            download()
+            return
+        }
         RequestManager.shared.getPageImageUrl(url: urlString) { [weak self] url in
             guard let self = self else { return }
             guard let url = url else {
                 self.imageLoadComplete()
                 return
             }
-            SDWebImageDownloader.shared.downloadImage(with: URL(string: url)!, options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil, completed: { [weak self] (image, data, _, _) in
-                guard let self = self else { return }
-                self.imageCache.store(image, imageData: data, forKey: self.urlString, cacheType: .all)
-                self.underlyingImage = image
-                DispatchQueue.main.async {
-                    print("下载完成" + self.urlString)
-                    self.imageLoadComplete()
-                }
-            })
+            self.imageUrl = url
+            self.download()
         }
         
     }
+    
+    func download() {
+        KingfisherManager.shared.downloader.downloadImage(
+            with: URL(string: imageUrl!)!,
+            options: [.cacheOriginalImage],
+            progressBlock: nil,
+            completionHandler: { [weak self] (result) in
+                switch result {
+                case .success(let value):
+                    guard let self = self else { return }
+                    self.underlyingImage = value.image
+                    KingfisherManager.shared.cache.storeToDisk(value.originalData, forKey: self.urlString)  //缓存到磁盘
+                    DispatchQueue.main.async {
+                        print("下载完成" + self.urlString)
+                        self.imageLoadComplete()
+                    }
+                case .failure(let error):
+                    print(error)
+                }
+        })
+    }
 
     func checkCache() {
-        imageCache.queryImage(forKey: urlString, options: [.highPriority], context: nil) { [weak self] (image, _, _) in
-            if let diskCache = image, let self = self {
-                self.underlyingImage = diskCache
+        imageCache.retrieveImage(forKey: urlString) { [weak self] (result) in
+            switch result {
+            case .success(let value):
+                guard let self = self else { return }
+                self.underlyingImage = value.image
                 self.imageLoadComplete()
+            case .failure(let error):
+                print(error)
             }
         }
     }

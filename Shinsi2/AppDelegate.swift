@@ -1,7 +1,7 @@
 import UIKit
 
 import SVProgressHUD
-import SDWebImage
+import Kingfisher
 
 @UIApplicationMain
 
@@ -12,13 +12,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setDefaultAppearance()
         setDefaultHudAppearance()
         Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
-        SDImageCache.shared.config.maxDiskSize = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)     //maxCacheSize
-        SDImageCache.shared.config.maxMemoryCost = UInt(1024 * 1024 * 512)
-        SDWebImageDownloader.shared.config.maxConcurrentDownloads = 1
+        
+        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)   //maxCacheSize
+        KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1024 * 1024 * 256
         #if DEBUG
         //RealmManager.shared.deleteSearchHistory()
-        //SDImageCache.shared().clearMemory()
-        //SDImageCache.shared().clearDisk()
+//        KingfisherManager.shared.cache.clearDiskCache()
+//        KingfisherManager.shared.cache.clearMemoryCache()
         #endif
         
         return true

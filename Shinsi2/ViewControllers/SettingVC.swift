@@ -1,6 +1,6 @@
 import UIKit
 import AloeStackView
-import SDWebImage
+import Kingfisher
 import SVProgressHUD
 import Hero
 import WebKit
@@ -147,26 +147,38 @@ class SettingVC: BaseViewController {
         
         let cacheSizeLable = createSubTitleLabel("size: counting...")
         stackView.addRow(cacheSizeLable)
-        DispatchQueue.global(qos: .background).async {
-            let cacheSize = Double(SDImageCache.shared.totalDiskSize()) / 1024 / 1024
-            DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
-                guard let self = self, let cacheSizeLable = cacheSizeLable else {return}
-                cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
-                
-                let clear = self.createTextLable("Delete All Cache")
-                clear.heightAnchor.constraint(equalToConstant: 50).isActive = true
-                clear.textAlignment = .right
-                clear.textColor = kMainColor
-                clear.isUserInteractionEnabled = true
-                self.stackView.insertRow(clear, after: cacheSizeLable)
-                self.stackView.setTapHandler(forRow: clear) { _ in
-                    SVProgressHUD.show()
-                    SDImageCache.shared.clearDisk(onCompletion: {
-                        SVProgressHUD.showSuccess(withStatus: "Deleted")
-                    })
+        
+        let clear = self.createTextLable("Delete All Cache")
+        clear.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        clear.textAlignment = .right
+        clear.textColor = kMainColor
+        clear.isUserInteractionEnabled = true
+        stackView.insertRow(clear, after: cacheSizeLable)
+        
+        KingfisherManager.shared.cache.calculateDiskStorageSize(
+            completion: { [weak self] (result) in
+                switch result {
+                case .success(let value):
+                    guard let self = self else { return }
+                    let cacheSize = Double(value) / 1024 / 1024
+                    
+                    DispatchQueue.main.async { [weak self, weak cacheSizeLable, weak clear] in
+                        guard let self = self, let cacheSizeLable = cacheSizeLable, let clear = clear else {return}
+                        cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
+                        
+                        self.stackView.setTapHandler(forRow: clear) { _ in
+                            SVProgressHUD.show()
+                            KingfisherManager.shared.cache.clearDiskCache(completion: {
+                                SVProgressHUD.showSuccess(withStatus: "Deleted")
+                                cacheSizeLable.text = "size: 0mb"
+                            })
+                        }
+                    }
+                    
+                case .failure(let error):
+                    print(error)
                 }
-            }
-        }
+        })
         
         //Info
         addWhiteSpace(height: 60)
@@ -247,7 +259,7 @@ class SettingVC: BaseViewController {
         let gbSize = sender.selectedSegmentIndex < 3 ? sender.selectedSegmentIndex : 4
         Defaults.Cache.maxCacheSize = gbSize * 1024
         //maxCacheSize
-        SDImageCache.shared.config.maxDiskSize = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)
+        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)   //maxCacheSize
     }
     
     func presentWebViewController(url: URL) {
