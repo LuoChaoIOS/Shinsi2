@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
         SDImageCache.shared.config.maxDiskSize = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)     //maxCacheSize
         SDImageCache.shared.config.maxMemoryCost = UInt(1024 * 1024 * 512)
+        SDWebImageDownloader.shared.config.maxConcurrentDownloads = 1
         #if DEBUG
         //RealmManager.shared.deleteSearchHistory()
         //SDImageCache.shared().clearMemory()
