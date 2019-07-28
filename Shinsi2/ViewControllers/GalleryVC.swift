@@ -123,7 +123,12 @@ class GalleryVC: BaseViewController {
         downloadButton.isEnabled = doujinshi.canDownload
         commentButton.isEnabled = doujinshi.comments.count > 0
         favoriteButton.isEnabled = !doujinshi.isFavorite && doujinshi.pages.count > 1
-        title = doujinshi.gdata?.getTitle() ?? doujinshi.title
+        let ntitle = doujinshi.gdata?.getTitle() ?? doujinshi.title
+        if let gdata = doujinshi.gdata, gdata.rating > 0 {
+            title = "\(gdata.rating)🌟 " + ntitle
+        } else {
+            title = ntitle
+        }
     }
     
     func loadPages() {

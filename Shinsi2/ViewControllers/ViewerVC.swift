@@ -169,38 +169,6 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         return pages.count
     }
     
-    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        print("willDisplay = \(indexPath.item)")
-        if indexPath.item == 0 && selectedIndexPath != indexPath && selectedIndexPath?.item != 1 {  //暂时解决每次重新点进时调用一次0位置的问题，减少资源占用
-            print("return willDisplay = \(indexPath.item)")
-            return
-        }
-//        let page  = getPage(for: indexPath)
-//        if let cell = cell as? ScrollingImageCell {
-//            if let photo = page.photo, let image = photo.underlyingImage {
-//                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
-//                    cell.imageView.image = image
-//                }
-//            }
-//        }
-
-        
-//        if let cell = cell as? ScrollingImageCell {
-//            if doujinshi.isDownloaded {
-//                if page.localImage?.sd_imageFormat == .GIF {
-//                    DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
-//                        cell.image = page.localImage
-//                    }
-//                }
-//            } else if let photo = page.photo, let image = photo.underlyingImage, image.sd_imageFormat == .GIF {
-//                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
-//                    cell.image = image
-//                }
-//            }
-//        }
-        
-    }
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScrollingImageCell)!
         cell.imageView.hero.id = heroID(for: indexPath)
@@ -211,7 +179,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
             print("return cellForItemAt = \(indexPath.item)")
             return cell
         }
-        
+        print("cellForItemAt = \(indexPath.item)")
         let page = getPage(for: indexPath)
         if doujinshi.isDownloaded {
             if let image = page.localImage {
@@ -229,10 +197,12 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
             let photo = page.photo!
             if let image = photo.underlyingImage {
                 cell.image = image
-            } else {
+            } else if page.thumbUrl != ""{
                 let resource = ImageResource(downloadURL: URL(string: page.thumbUrl)!, cacheKey: page.thumbUrl)
                 cell.imageView.kf.setImage(with: resource)
                 photo.loadUnderlyingImageAndNotify()
+            } else {
+                cell.image = nil
             }
         }
         
@@ -240,6 +210,18 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         let pageIndex = indexPath.item
         var count = 0
         for i in 1...5 {
+            //向后加载
+            if i + pageIndex <= doujinshi.pages.count - 1 {
+                if let nextPhoto = doujinshi.pages[i + pageIndex].photo, nextPhoto.underlyingImage == nil {
+                    nextPhoto.loadUnderlyingImageAndNotify()
+                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
+                    count += 1
+                    guard count < 5 else {  //最多加载5页
+                        break
+                    }
+                }
+            }
+            
             //向前加载最多两页
             if pageIndex - i >= 0 && i < 3 {
                 let p = pageIndex - i
@@ -249,16 +231,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
                     count += 1
                 }
             }
-            //向后加载
-            if i + pageIndex > doujinshi.pages.count - 1 { break }
-            if let nextPhoto = doujinshi.pages[i + pageIndex].photo, nextPhoto.underlyingImage == nil {
-                nextPhoto.loadUnderlyingImageAndNotify()
-                ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
-                count += 1
-                guard count < 5 else {  //最多加载5页
-                    break
-                }
-            }
+            
         }
         
         return cell
