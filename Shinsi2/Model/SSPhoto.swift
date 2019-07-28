@@ -8,6 +8,9 @@ public extension Notification.Name {
 class SSPhoto: NSObject {
     
     var underlyingImage: UIImage?
+    var lowQualityImage: UIImage? {
+        return underlyingImage?.sd_imageFormat == .GIF ? underlyingImage?.compressImageOnlength(maxLength: 1024 * 1024) : underlyingImage
+    }
     var urlString: String
     var isLoading = false
     let imageCache = SDWebImageManager.shared.imageCache

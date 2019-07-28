@@ -374,10 +374,10 @@ UICollectionViewDataSourcePrefetching {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = doujinshi.pages[indexPath.item]
         if doujinshi.isDownloaded {
-            cell.imageView.image = page.localImage
+            cell.imageView.image = page.lowQualityImage
             cell.loadingView?.hide(animated: false)
         } else {
-            if let image = ImageManager.shared.getCache(forKey: page.url) {
+            if let image = ImageManager.shared.getLowQualityCache(forKey: page.url) {
                 cell.imageView.image = image
                 cell.loadingView?.hide(animated: false)
             } else {

@@ -169,6 +169,29 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         return pages.count
     }
     
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        print("willDisplay = \(indexPath.item)")
+        if indexPath.item == 0 && selectedIndexPath != indexPath && selectedIndexPath?.item != 1 {  //暂时解决每次重新点进时调用一次0位置的问题，减少资源占用
+            print("return willDisplay = \(indexPath.item)")
+            return
+        }
+        let page = getPage(for: indexPath)
+        if let cell = cell as? ScrollingImageCell {
+            if doujinshi.isDownloaded {
+                if page.localImage?.sd_imageFormat == .GIF {
+                    DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
+                        cell.image = page.localImage
+                    }
+                }
+            } else if let photo = page.photo, let image = photo.underlyingImage, image.sd_imageFormat == .GIF {
+                DispatchQueue.main.asyncAfter(deadline: .now() +  DispatchTimeInterval.milliseconds(1000)) {
+                    cell.image = image
+                }
+            }
+        }
+        
+    }
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScrollingImageCell)!
         cell.imageView.hero.id = heroID(for: indexPath)
@@ -177,19 +200,24 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         
         let page = getPage(for: indexPath)
         if doujinshi.isDownloaded {
-            cell.image = page.localImage
+            cell.image = page.lowQualityImage
         } else {
             let photo = page.photo!
-            if let image = photo.underlyingImage {
+            if let image = photo.lowQualityImage {
                 cell.image = image
             } else {
-                if let image = ImageManager.shared.getCache(forKey: page.thumbUrl) { 
+                if let image = ImageManager.shared.getCache(forKey: page.thumbUrl) {
                     cell.image = image
                 } else {
                     cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
                 } 
                 photo.loadUnderlyingImageAndNotify()
             }
+        }
+        
+        if indexPath.item == 0 && selectedIndexPath != indexPath && selectedIndexPath?.item != 1 {  //解决每次重新点进时调用一次0位置的问题，减少资源占用
+            print("return cellForItemAt = \(indexPath.item)")
+            return cell
         }
         
         //prefetch

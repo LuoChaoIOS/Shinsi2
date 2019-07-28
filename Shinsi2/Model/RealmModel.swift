@@ -53,6 +53,9 @@ class Page: Object {
     var localImage: UIImage? {
         return UIImage(contentsOfFile: localUrl.path)
     }
+    var lowQualityImage: UIImage? {
+        return localImage?.sd_imageFormat == .GIF ? localImage?.compressImageOnlength(maxLength: 1024 * 1024) : localImage
+    }
     static func blankPage() -> Page {
         let p = Page()
         p.photo = SSPhoto(URL: "")
