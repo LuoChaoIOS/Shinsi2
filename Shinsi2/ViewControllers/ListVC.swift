@@ -198,7 +198,6 @@ class ListVC: BaseViewController {
             }
             
             if let gdata = cachedGdatas["\(doujinshi.id)"] {
-                print(doujinshi.id)
                 doujinshi.gdata = gdata
                 block?()
                 return
@@ -365,10 +364,11 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         
         let doujinshi = self.items[indexPath.item]
         
-        checkGData(indexPath: indexPath) {
-//            guard collectionView.visibleCells.contains(cell) else { return }
+        checkGData(indexPath: indexPath) { [weak cell] in
+            guard let c = cell, c.tag == doujinshi.id else { return }
             
-            let cell = cell as! ListCell
+            let cell = c as! ListCell
+            
             if let rating = doujinshi.gdata?.rating, rating > 0 {
                 cell.ratingLabel.text = "🌟\(rating)"
                 cell.ratingLabel.isHidden = false
@@ -385,16 +385,24 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
                 cell.categoryLabel.isHidden = true
             }
             
-            var str = "\n"
             if let time = doujinshi.gdata?.posted {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd HH:mm"
                 let date = Date(timeIntervalSince1970: TimeInterval(integerLiteral: Int64(time)!))
                 let timeStr = formatter.string(from: date)
-                str += timeStr
+                cell.timeLabel.text = timeStr
+                cell.timeLabel.isHidden = false
+            } else {
+                cell.timeLabel.isHidden = true
             }
             
-            cell.titleLabel?.text = doujinshi.title + str
+            if let fileCount = doujinshi.gdata?.filecount {
+                cell.fileCountLabel.text = "\(fileCount) pages"
+                cell.fileCountLabel.isHidden = false
+            } else {
+                cell.fileCountLabel.isHidden = true
+            }
+            
         }
     }
     
@@ -405,6 +413,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.imageView.hero.id = "image_\(doujinshi.id)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
+        cell.tag = doujinshi.id
         
         if doujinshi.isDownloaded {
             if let image = UIImage(contentsOfFile: documentURL.appendingPathComponent(doujinshi.coverUrl).path) {
@@ -459,16 +468,25 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             cell.categoryLabel.isHidden = true
         }
         
-        var str = "\n"
         if let time = doujinshi.gdata?.posted {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm"
             let date = Date(timeIntervalSince1970: TimeInterval(integerLiteral: Int64(time)!))
             let timeStr = formatter.string(from: date)
-            str += timeStr
+            cell.timeLabel.text = timeStr
+            cell.timeLabel.isHidden = false
+        } else {
+            cell.timeLabel.isHidden = true
         }
         
-        cell.titleLabel?.text = doujinshi.title + str
+        if let fileCount = doujinshi.gdata?.filecount {
+            cell.fileCountLabel.text = "\(fileCount) pages"
+            cell.fileCountLabel.isHidden = false
+        } else {
+            cell.fileCountLabel.isHidden = true
+        }
+        
+        cell.titleLabel?.text = doujinshi.title
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
         cell.layer.shouldRasterize = true
@@ -479,7 +497,11 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         guard mode != .download else {return}
-        let urls = indexPaths.map { URL(string: items[$0.item].coverUrl)! }
+        
+        let tempItems = indexPaths.map { $0.item }
+        if tempItems.contains(items.count) || items.count == 0 { return }
+        
+        let urls = indexPaths.map { URL(string: self.items[$0.item].coverUrl)! }
         ImageManager.shared.prefetch(urls: urls)
     }
     

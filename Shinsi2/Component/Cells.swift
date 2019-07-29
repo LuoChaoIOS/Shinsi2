@@ -16,6 +16,8 @@ class ListCell: ImageCell {
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var categoryLabel: InsetLabel!
     @IBOutlet weak var ratingLabel: InsetLabel!
+    @IBOutlet weak var timeLabel: InsetLabel!
+    @IBOutlet weak var fileCountLabel: InsetLabel!
 }
 
 class CommentCell: UITableViewCell {

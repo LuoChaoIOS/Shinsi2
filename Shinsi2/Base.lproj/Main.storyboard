@@ -154,7 +154,7 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptR-dm-vYh" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="123.66666666666667" width="132" height="13.333333333333329"/>
+                                                    <rect key="frame" x="0.0" y="111.66666666666667" width="132" height="13.333333333333329"/>
                                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.49515732020547948" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <fontDescription key="fontDescription" type="system" weight="thin" pointSize="11"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -203,6 +203,48 @@
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                 </label>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2019-07-30" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8d0-Ig-hTW" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="125" width="79.333333333333329" height="12"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.50385381711409394" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="topInset">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                                            <real key="value" value="3"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="bottomInset">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                                            <real key="value" value="3"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </label>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100 pages" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AIK-qQ-WC7" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
+                                                    <rect key="frame" x="79.333333333333329" y="125" width="52.666666666666671" height="12"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="8"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="topInset">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                                            <real key="value" value="3"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="bottomInset">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                                            <real key="value" value="6"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </label>
                                             </subviews>
                                         </view>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -210,23 +252,32 @@
                                             <constraint firstAttribute="trailing" secondItem="ptR-dm-vYh" secondAttribute="trailing" id="8S2-KW-GVq"/>
                                             <constraint firstItem="uR1-KK-J1h" firstAttribute="top" secondItem="c9y-8F-GMW" secondAttribute="bottom" constant="4" id="Dqw-Vv-W4e"/>
                                             <constraint firstAttribute="trailing" secondItem="ZTW-EI-t44" secondAttribute="trailing" constant="4" id="FV7-iR-HHG"/>
-                                            <constraint firstAttribute="bottom" secondItem="ptR-dm-vYh" secondAttribute="bottom" id="IRl-he-url"/>
+                                            <constraint firstAttribute="trailing" secondItem="AIK-qQ-WC7" secondAttribute="trailing" id="Ida-I6-KzC"/>
+                                            <constraint firstAttribute="bottom" secondItem="8d0-Ig-hTW" secondAttribute="bottom" id="Q2N-id-cv2"/>
+                                            <constraint firstAttribute="bottom" secondItem="AIK-qQ-WC7" secondAttribute="bottom" id="QkN-nK-D0z"/>
+                                            <constraint firstItem="8d0-Ig-hTW" firstAttribute="leading" secondItem="QYS-NN-Kke" secondAttribute="leading" id="R7t-m5-YdL"/>
                                             <constraint firstItem="uR1-KK-J1h" firstAttribute="leading" secondItem="QYS-NN-Kke" secondAttribute="leading" constant="4" id="TJ9-NZ-Npz"/>
+                                            <constraint firstItem="AIK-qQ-WC7" firstAttribute="top" secondItem="ptR-dm-vYh" secondAttribute="bottom" id="YPU-B4-hoi"/>
+                                            <constraint firstItem="8d0-Ig-hTW" firstAttribute="top" secondItem="ptR-dm-vYh" secondAttribute="bottom" id="dMj-HP-fft"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hDY-7k-p70" secondAttribute="trailing" symbolic="YES" id="dXy-az-ZKx"/>
                                             <constraint firstItem="ZTW-EI-t44" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="QYS-NN-Kke" secondAttribute="leading" symbolic="YES" id="eB9-VN-MZp"/>
                                             <constraint firstItem="c9y-8F-GMW" firstAttribute="leading" secondItem="QYS-NN-Kke" secondAttribute="leading" constant="4" id="fg9-nY-omF"/>
+                                            <constraint firstItem="8d0-Ig-hTW" firstAttribute="width" secondItem="QYS-NN-Kke" secondAttribute="width" multiplier="0.6" id="hhV-gT-ref"/>
                                             <constraint firstItem="hDY-7k-p70" firstAttribute="leading" secondItem="QYS-NN-Kke" secondAttribute="leading" constant="4" id="jxd-RA-OkR"/>
                                             <constraint firstItem="ptR-dm-vYh" firstAttribute="leading" secondItem="QYS-NN-Kke" secondAttribute="leading" id="r68-aJ-dJa"/>
                                             <constraint firstItem="hDY-7k-p70" firstAttribute="top" secondItem="uR1-KK-J1h" secondAttribute="bottom" constant="4" id="rCG-xS-8L1"/>
                                             <constraint firstItem="ZTW-EI-t44" firstAttribute="top" secondItem="QYS-NN-Kke" secondAttribute="top" constant="4" id="uno-YX-DnI"/>
                                             <constraint firstItem="c9y-8F-GMW" firstAttribute="top" secondItem="QYS-NN-Kke" secondAttribute="top" constant="4" id="wOO-qO-v2W"/>
+                                            <constraint firstItem="AIK-qQ-WC7" firstAttribute="leading" secondItem="8d0-Ig-hTW" secondAttribute="trailing" id="wWN-Oi-Nmo"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="categoryLabel" destination="c9y-8F-GMW" id="nHe-HD-eFW"/>
                                             <outlet property="conventionLabel" destination="ZTW-EI-t44" id="WWe-1l-Wxu"/>
+                                            <outlet property="fileCountLabel" destination="AIK-qQ-WC7" id="l3X-9w-dsg"/>
                                             <outlet property="imageView" destination="Evj-hg-gfT" id="nQk-gt-Oee"/>
                                             <outlet property="languageLabel" destination="hDY-7k-p70" id="Wfk-Bp-28T"/>
                                             <outlet property="ratingLabel" destination="uR1-KK-J1h" id="Fg3-5w-Cdg"/>
+                                            <outlet property="timeLabel" destination="8d0-Ig-hTW" id="JyZ-AO-1UA"/>
                                             <outlet property="titleLabel" destination="ptR-dm-vYh" id="u5x-eN-fD8"/>
                                         </connections>
                                     </collectionViewCell>
