@@ -3,6 +3,10 @@ import RealmSwift
 import SVProgressHUD
 import Kingfisher
 
+//缓存gdata
+var cachedGdatas = [String: GData]()
+fileprivate var checkingDoujinshi = [Int]()
+
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     private(set) lazy var searchController: UISearchController = {
@@ -41,7 +45,6 @@ class ListVC: BaseViewController {
         let text = searchController.searchBar.text?.lowercased() ?? ""
         return text == "favorites" ? -1 : Int(text.replacingOccurrences(of: "favorites", with: ""))
     }
-    private var checkingDoujinshi = [Int]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -164,6 +167,7 @@ class ListVC: BaseViewController {
     }
 
     func reloadData() {
+        checkingDoujinshi.removeAll()   //清除正在获取数据的id
         currentPage = -1
         loadingPage = -1
         let deleteIndexPaths = items.enumerated().map { IndexPath(item: $0.offset, section: 0)}
@@ -179,14 +183,13 @@ class ListVC: BaseViewController {
         let index = indexPath.item
         guard items.count >= index, !checkingDoujinshi.contains(items[index].id) else { return }
         
-        let doujinshi = items[index]
-        if doujinshi.isDownloaded || doujinshi.gdata != nil {
-            
+        if items[index].isDownloaded || items[index].gdata != nil {
             return
         } else {
-            //Temp cover
-            checkingDoujinshi.append(doujinshi.id)
             
+            let doujinshi = items[index]
+            
+            //Temp cover
             doujinshi.pages.removeAll()
             if !doujinshi.coverUrl.isEmpty {
                 let coverPage = Page()
@@ -194,15 +197,29 @@ class ListVC: BaseViewController {
                 doujinshi.pages.append(coverPage)
             }
             
+            if let gdata = cachedGdatas["\(doujinshi.id)"] {
+                print(doujinshi.id)
+                doujinshi.gdata = gdata
+                block?()
+                return
+            }
+            //保存需要请求的id
+            checkingDoujinshi.append(doujinshi.id)
+            
             RequestManager.shared.getGData(doujinshi: doujinshi) { [weak self] gdata in
-                guard let gdata = gdata, let self = self else { return }
-                self.items[index].pages.removeAll()
-                self.items[index].gdata = gdata
+                //网络请求有延迟，如果当前页面快速切换，需要判断当前画廊是否还存在
+                guard let gdata = gdata,
+                    let self = self,
+                    self.items.count >= index,
+                    doujinshi.id == self.items[index].id,
+                    checkingDoujinshi.contains(doujinshi.id)
+                    else { return }
                 
-                let temp = self.checkingDoujinshi.filter({ (item) -> Bool in
-                    return item != doujinshi.id
-                })
-                self.checkingDoujinshi = temp
+                doujinshi.gdata = gdata
+                cachedGdatas["\(doujinshi.id)"] = gdata  //缓存 gdata
+                //删除已请求的id
+                let temp = checkingDoujinshi.filter { return $0 != doujinshi.id }
+                checkingDoujinshi = temp
                 block?()
             }
         }
@@ -349,7 +366,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let doujinshi = self.items[indexPath.item]
         
         checkGData(indexPath: indexPath) {
-            guard collectionView.visibleCells.contains(cell) else { return }
+//            guard collectionView.visibleCells.contains(cell) else { return }
             
             let cell = cell as! ListCell
             if let rating = doujinshi.gdata?.rating, rating > 0 {

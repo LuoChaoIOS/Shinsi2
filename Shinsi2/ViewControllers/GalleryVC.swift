@@ -116,6 +116,7 @@ class GalleryVC: BaseViewController {
                 self.loadingView.hide()
                 self.doujinshi.pages.removeAll()
                 self.doujinshi.gdata = gdata
+                cachedGdatas["\(self.doujinshi.id)"] = gdata    //缓存gdata
                 self.updateNavigationItems()
                 self.loadPages()
             }
