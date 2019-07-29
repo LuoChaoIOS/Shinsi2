@@ -132,28 +132,38 @@ class GalleryVC: BaseViewController {
     }
     
     func loadPages() {
-        RequestManager.shared.getDoujinshi(doujinshi: doujinshi, at: currentPage) { [weak self] pages in
-            guard let self = self, pages.count > 0 else { return }
-            self.favoriteButton.isEnabled = !self.doujinshi.isFavorite
-            self.commentButton.isEnabled = self.doujinshi.comments.count > 0
-            let isTempCover = self.doujinshi.pages.count == 0 && self.collectionView.numberOfItems(inSection: 0) == 1
-            self.doujinshi.pages.append(objectsIn: pages)
-            var new = pages.map({IndexPath(item: self.doujinshi.pages.index(of: $0)!, section: 0)})
-            if isTempCover {
-                new.remove(at: 0)
-                ImageManager.shared.prefetch(urls: [URL(string: pages.first!.thumbUrl)!])
-            }
-            self.collectionView.performBatchUpdates({
-                self.collectionView.insertItems(at: new)
-            }, completion: nil)
-            
-            if self.doujinshi.pages.count < self.doujinshi.gdata!.filecount {
-                self.currentPage += 1
-                self.loadPages()
-            } else {
-                self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(doujinshi: self.doujinshi)
-            }
-        }
+        
+        RequestManager.shared.getDoujinshi(
+            doujinshi: doujinshi,
+            at: currentPage,
+            completeBlock: { [weak self] pages in
+                guard let self = self, pages.count > 0 else { return }
+                self.favoriteButton.isEnabled = !self.doujinshi.isFavorite
+                self.commentButton.isEnabled = self.doujinshi.comments.count > 0
+                let isTempCover = self.doujinshi.pages.count == 0 && self.collectionView.numberOfItems(inSection: 0) == 1
+                self.doujinshi.pages.append(objectsIn: pages)
+                var new = pages.map({IndexPath(item: self.doujinshi.pages.index(of: $0)!, section: 0)})
+                if isTempCover {
+                    new.remove(at: 0)
+                    ImageManager.shared.prefetch(urls: [URL(string: pages.first!.thumbUrl)!])
+                }
+                self.collectionView.performBatchUpdates({
+                    self.collectionView.insertItems(at: new)
+                }, completion: nil)
+                
+                if self.doujinshi.pages.count < self.doujinshi.gdata!.filecount {
+                    self.currentPage += 1
+                    self.loadPages()
+                } else {
+                    self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(doujinshi: self.doujinshi)
+                }
+                
+            },
+            failuedBlock: {(message) in
+                SVProgressHUD.showInfo(withStatus: message)
+                
+        })
+        
     }
     
     @IBAction func addToFavorite(sender: UIBarButtonItem) {

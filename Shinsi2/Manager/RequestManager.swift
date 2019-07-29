@@ -99,7 +99,7 @@ class RequestManager {
         }
     }
     
-    func getDoujinshi(doujinshi: Doujinshi, at page: Int, completeBlock block: (([Page]) -> Void)?) {
+    func getDoujinshi(doujinshi: Doujinshi, at page: Int, completeBlock block: (([Page]) -> Void)?, failuedBlock failuedblock: ((_ message: String) -> Void)?) {
         print(#function)
         var url = doujinshi.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
@@ -112,6 +112,17 @@ class RequestManager {
                 return
             }
             if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
+                
+                //check removed
+                let p = doc.xpath("//div [@class='d'] //p")
+                if p.count > 0 {
+                    let p1 = p[0]
+                    if p1.text?.contains("unavailable") ?? false || p1.text?.contains("removed") ?? false {
+                        failuedblock?(p1.text ?? "")
+                    }
+                }
+                
+                
                 var pages: [Page] = []
                 for link in doc.xpath("//div [@class='gdtl'] //a") {
                     if let url = link["href"] {
