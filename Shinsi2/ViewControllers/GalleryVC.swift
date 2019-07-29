@@ -392,7 +392,10 @@ UICollectionViewDataSourcePrefetching {
             if let image = page.localImage {
                 cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)
                 cell.loadingView?.hide(animated: false)
-            } else {    //如果没有下载
+            } else if let photo = page.photo, let image = photo.underlyingImage {    //如果没有下载
+                cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)
+                cell.loadingView?.hide(animated: false)
+            } else { //如果没有下载
                 ImageManager.shared.getCache(forKey: page.url) { (image) in
                     if let image = image {
                         cell.imageView.image = UIImage(data: image.jpegData(compressionQuality: 0.5)!)

@@ -48,7 +48,7 @@ class RealmManager {
     }
     
     func saveDownloadedDoujinshi(book: Doujinshi) {
-        var tempPages = List<Page>()
+        let tempPages = List<Page>()
         for i in 0..<book.pages.count {
             tempPages.append(book.pages[i])
         }

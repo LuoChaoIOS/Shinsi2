@@ -184,7 +184,9 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         if doujinshi.isDownloaded {
             if let image = page.localImage {
                 cell.image = image
-            } else {    //如果没有下载
+            } else if let photo = page.photo, let image = photo.underlyingImage {    //如果没有下载
+                cell.image = image
+            }else { //如果没有下载
                 ImageManager.shared.getCache(forKey: page.url) { (image) in
                     if let image = image {
                         cell.image = image
