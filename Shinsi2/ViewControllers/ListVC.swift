@@ -149,8 +149,11 @@ class ListVC: BaseViewController {
                 self.loadingView.hide()
                 guard books.count > 0 else {return}
                 let lastIndext = max(0, self.items.count - 1)
-                let insertIndexPaths = books.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
-                self.items += books
+                //如果使用最低评分过滤，页面返回的数据会有重复内容，网站上会有个from参数去重，暂时不知怎么解析，所以才去手动去除重复画廊
+                let existedIds = self.items.map { $0.id }
+                let newBooks = books.filter { return !existedIds.contains($0.id) }
+                let insertIndexPaths = newBooks.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
+                self.items += newBooks
                 self.collectionView.performBatchUpdates({
                     self.collectionView.insertItems(at: insertIndexPaths)
                 }, completion: nil)

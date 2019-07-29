@@ -17,8 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1024 * 1024 * 256
         #if DEBUG
         //RealmManager.shared.deleteSearchHistory()
-//        KingfisherManager.shared.cache.clearDiskCache()
-//        KingfisherManager.shared.cache.clearMemoryCache()
+        //KingfisherManager.shared.cache.clearDiskCache()
+        //KingfisherManager.shared.cache.clearMemoryCache()
         #endif
         
         return true
