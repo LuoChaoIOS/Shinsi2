@@ -14,6 +14,8 @@ class ListCell: ImageCell {
     @IBOutlet weak var languageLabel: UILabel!
     @IBOutlet weak var conventionLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel?
+    @IBOutlet weak var categoryLabel: InsetLabel!
+    @IBOutlet weak var ratingLabel: InsetLabel!
 }
 
 class CommentCell: UITableViewCell {

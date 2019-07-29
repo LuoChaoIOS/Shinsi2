@@ -122,6 +122,12 @@ class RequestManager {
                     }
                 }
                 
+                //TODO: tag 处理，接口获取的不全
+//                let tagKeys = doc.xpath("//div [@id='taglist'] //td [@class='tc']")
+//                for i in 0..<tagKeys.count {
+//                    let str = tagKeys[i].text
+//                    let key = str?.replacingOccurrences(of: ":", with: "")
+//                }
                 
                 var pages: [Page] = []
                 for link in doc.xpath("//div [@class='gdtl'] //a") {
@@ -215,13 +221,23 @@ class RequestManager {
                     if let metadata = metadatas[0] as? NSDictionary {
                         if let count = metadata["filecount"]  as? String,
                             let rating = metadata["rating"] as? String,
+                            let category = metadata["category"] as? String,
+                            let posted = metadata["posted"] as? String,
                             let title = metadata["title"] as? String,
                             let title_jpn = metadata["title_jpn"] as? String,
                             let tags = metadata["tags"] as? [String],
                             let thumb = metadata["thumb"] as? String,
                             let uploader = metadata["uploader"] as? String,
                             let gid = metadata["gid"] as? Int {
-                            let gdata = GData(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid), "uploader": uploader])
+                            let gdata = GData(value: ["filecount": Int(count)!,
+                                                      "rating": Float(rating)!,
+                                                      "category": category,
+                                                      "posted": posted,
+                                                      "title": title.isEmpty ? doujinshi.title : title,
+                                                      "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn,
+                                                      "coverUrl": thumb,
+                                                      "gid": String(gid),
+                                                      "uploader": uploader])
                             for t in tags {
                                 gdata.tags.append(Tag(value: ["name": t]))
                             }

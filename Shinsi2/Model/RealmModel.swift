@@ -64,6 +64,8 @@ class GData: Object {
     @objc dynamic var gid = ""
     @objc dynamic var filecount = 0
     @objc dynamic var rating: Float = 0.0
+    @objc dynamic var category = ""
+    @objc dynamic var posted = "0"
     @objc dynamic var title = ""
     @objc dynamic var title_jpn = ""
     func getTitle() -> String {

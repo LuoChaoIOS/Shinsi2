@@ -98,6 +98,10 @@ class GalleryVC: BaseViewController {
             loadingView.hide()
             currentPage = doujinshi.pages.count / perPageCount
             loadPages()
+        } else if doujinshi.gdata != nil, doujinshi.pages.count == 0 {
+            loadingView.hide()
+            currentPage = 0
+            loadPages()
         } else {
             //Temp cover
             doujinshi.pages.removeAll()

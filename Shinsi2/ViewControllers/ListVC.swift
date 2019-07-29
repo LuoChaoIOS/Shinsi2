@@ -41,6 +41,7 @@ class ListVC: BaseViewController {
         let text = searchController.searchBar.text?.lowercased() ?? ""
         return text == "favorites" ? -1 : Int(text.replacingOccurrences(of: "favorites", with: ""))
     }
+    private var checkingDoujinshi = [Int]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -169,6 +170,39 @@ class ListVC: BaseViewController {
         }, completion: { _ in
             self.loadNextPage()
         })
+    }
+    
+    func checkGData(indexPath: IndexPath, completeBlock block: (() -> Void)?) {
+        let index = indexPath.item
+        guard items.count >= index, !checkingDoujinshi.contains(items[index].id) else { return }
+        
+        let doujinshi = items[index]
+        if doujinshi.isDownloaded || doujinshi.gdata != nil {
+            
+            return
+        } else {
+            //Temp cover
+            checkingDoujinshi.append(doujinshi.id)
+            
+            doujinshi.pages.removeAll()
+            if !doujinshi.coverUrl.isEmpty {
+                let coverPage = Page()
+                coverPage.thumbUrl = doujinshi.coverUrl
+                doujinshi.pages.append(coverPage)
+            }
+            
+            RequestManager.shared.getGData(doujinshi: doujinshi) { [weak self] gdata in
+                guard let gdata = gdata, let self = self else { return }
+                self.items[index].pages.removeAll()
+                self.items[index].gdata = gdata
+                
+                let temp = self.checkingDoujinshi.filter({ (item) -> Bool in
+                    return item != doujinshi.id
+                })
+                self.checkingDoujinshi = temp
+                block?()
+            }
+        }
     }
 
     @IBAction func showFavorites(sender: UIBarButtonItem) {
@@ -305,7 +339,44 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return items.count
-    } 
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        let doujinshi = self.items[indexPath.item]
+        
+        checkGData(indexPath: indexPath) {
+            guard collectionView.visibleCells.contains(cell) else { return }
+            
+            let cell = cell as! ListCell
+            if let rating = doujinshi.gdata?.rating, rating > 0 {
+                cell.ratingLabel.text = "🌟\(rating)"
+                cell.ratingLabel.isHidden = false
+                cell.ratingLabel.layer.cornerRadius = cell.ratingLabel.bounds.height/2
+            } else {
+                cell.ratingLabel.isHidden = true
+            }
+            
+            if let category = doujinshi.gdata?.category {
+                cell.categoryLabel.isHidden = false
+                cell.categoryLabel.text = category
+                cell.categoryLabel.layer.cornerRadius = cell.categoryLabel.bounds.height/2
+            } else {
+                cell.categoryLabel.isHidden = true
+            }
+            
+            var str = "\n"
+            if let time = doujinshi.gdata?.posted {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm"
+                let date = Date(timeIntervalSince1970: TimeInterval(integerLiteral: Int64(time)!))
+                let timeStr = formatter.string(from: date)
+                str += timeStr
+            }
+            
+            cell.titleLabel?.text = doujinshi.title + str
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ListCell
@@ -352,7 +423,32 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             cell.conventionLabel.isHidden = true
         }
         
-        cell.titleLabel?.text = doujinshi.title
+        if let rating = doujinshi.gdata?.rating, rating > 0 {
+            cell.ratingLabel.text = "🌟\(rating)"
+            cell.ratingLabel.isHidden = false
+            cell.ratingLabel.layer.cornerRadius = cell.ratingLabel.bounds.height/2
+        } else {
+            cell.ratingLabel.isHidden = true
+        }
+        
+        if let category = doujinshi.gdata?.category {
+            cell.categoryLabel.isHidden = false
+            cell.categoryLabel.text = category
+            cell.categoryLabel.layer.cornerRadius = cell.categoryLabel.bounds.height/2
+        } else {
+            cell.categoryLabel.isHidden = true
+        }
+        
+        var str = "\n"
+        if let time = doujinshi.gdata?.posted {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm"
+            let date = Date(timeIntervalSince1970: TimeInterval(integerLiteral: Int64(time)!))
+            let timeStr = formatter.string(from: date)
+            str += timeStr
+        }
+        
+        cell.titleLabel?.text = doujinshi.title + str
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
         cell.layer.shouldRasterize = true
