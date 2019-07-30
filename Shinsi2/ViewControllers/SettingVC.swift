@@ -12,6 +12,7 @@ extension Notification.Name {
 class SettingVC: BaseViewController {
     
     let stackView = AloeStackView()
+    let minimumRatingSeg = UISegmentedControl(items: ["2🌟", "3🌟", "4🌟", "5🌟"])
     private var backGesture: InteractiveBackGesture?
 
     override func viewDidLoad() {
@@ -69,7 +70,8 @@ class SettingVC: BaseViewController {
         minimunRatingSwitch.isOn = Defaults.Search.isMinimumRating
         minimunRatingSwitch.addTarget(self, action: #selector(filterMinimunRatingSwitchVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(createStackView([minimunRatingLabel, minimunRatingSwitch]))
-        let minimumRatingSeg = UISegmentedControl(items: ["2🌟", "3🌟", "4🌟", "5🌟"])
+        
+        minimumRatingSeg.isEnabled = Defaults.Search.isMinimumRating
         minimumRatingSeg.selectedSegmentIndex = Defaults.Search.minimumRating - 2
         minimumRatingSeg.addTarget(self, action: #selector(filterMinimunRatingSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(minimumRatingSeg)
@@ -250,6 +252,7 @@ class SettingVC: BaseViewController {
     
     @objc func filterMinimunRatingSwitchVauleChanged(sender: UISwitch) {
         Defaults.Search.isMinimumRating = sender.isOn
+        minimumRatingSeg.isEnabled = sender.isOn
     }
     
     @objc func cacheSizeSegmentedControlVauleChanged(sender: UISegmentedControl) {
