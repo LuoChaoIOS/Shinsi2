@@ -156,23 +156,20 @@ class SettingVC: BaseViewController {
         stackView.insertRow(clear, after: cacheSizeLable)
         
         KingfisherManager.shared.cache.calculateDiskStorageSize(
-            completion: { [weak self] (result) in
+            completion: { [weak self, weak cacheSizeLable, weak clear] (result) in
                 switch result {
                 case .success(let value):
-                    guard let self = self else { return }
-                    let cacheSize = Double(value) / 1024 / 1024
+                    guard let self = self, let cacheSizeLable = cacheSizeLable, let clear = clear else {return}
                     
-                    DispatchQueue.main.async { [weak self, weak cacheSizeLable, weak clear] in
-                        guard let self = self, let cacheSizeLable = cacheSizeLable, let clear = clear else {return}
-                        cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
-                        
-                        self.stackView.setTapHandler(forRow: clear) { _ in
-                            SVProgressHUD.show()
-                            KingfisherManager.shared.cache.clearDiskCache(completion: {
-                                SVProgressHUD.showSuccess(withStatus: "Deleted")
-                                cacheSizeLable.text = "size: 0mb"
-                            })
-                        }
+                    let cacheSize = Double(value) / 1024 / 1024
+                    cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
+                    
+                    self.stackView.setTapHandler(forRow: clear) { _ in
+                        SVProgressHUD.show()
+                        KingfisherManager.shared.cache.clearDiskCache(completion: {
+                            SVProgressHUD.showSuccess(withStatus: "Deleted")
+                            cacheSizeLable.text = "size: 0mb"
+                        })
                     }
                     
                 case .failure(let error):

@@ -500,10 +500,11 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        guard mode != .download else {return}
+        guard mode != .download, items.count > 0 else {return}
         
         let tempItems = indexPaths.map { $0.item }
-        if tempItems.contains(items.count) || items.count == 0 { return }
+        let exceed = tempItems.filter { return $0 >= items.count }.count > 0
+        guard !exceed else { return }
         
         let urls = indexPaths.map { URL(string: self.items[$0.item].coverUrl)! }
         ImageManager.shared.prefetch(urls: urls)
