@@ -11,10 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         setDefaultAppearance()
         setDefaultHudAppearance()
+        setDefaultKingfisherConfig()
         Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
-        
-        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)   //maxCacheSize
-        KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1024 * 1024 * 256
+    
         #if DEBUG
         //RealmManager.shared.deleteSearchHistory()
         //KingfisherManager.shared.cache.clearDiskCache()
@@ -22,6 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #endif
         
         return true
+    }
+    
+    func setDefaultKingfisherConfig() {
+        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = UInt(1024 * 1024 * Defaults.Cache.maxCacheSize)   //maxCacheSize
+        KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1024 * 1024 * 256
+        KingfisherManager.shared.downloader.sessionConfiguration.httpMaximumConnectionsPerHost = 1
     }
     
     func setDefaultAppearance() {

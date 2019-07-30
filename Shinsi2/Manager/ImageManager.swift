@@ -31,8 +31,8 @@ class ImageManager {
         progressBlock: nil) { (_, _, _) in
             prefetchUrls.forEach { self.downloadingUrls.remove($0.downloadURL) }
         }
+        prefetcher.maxConcurrentDownloads = maxConcurrentOperationCount
         prefetcher.start()
-        
     }
 }
 

@@ -5,7 +5,7 @@ import Kingfisher
 
 //缓存gdata
 var cachedGdatas = [String: GData]()
-fileprivate var checkingDoujinshi = [Int]()
+private var checkingDoujinshi = [Int]()
 
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -45,6 +45,8 @@ class ListVC: BaseViewController {
         let text = searchController.searchBar.text?.lowercased() ?? ""
         return text == "favorites" ? -1 : Int(text.replacingOccurrences(of: "favorites", with: ""))
     }
+    
+    private var existedIds = [Int]()    //缓存已获取的画廊id
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,8 +155,9 @@ class ListVC: BaseViewController {
                 guard books.count > 0 else {return}
                 let lastIndext = max(0, self.items.count - 1)
                 //如果使用最低评分过滤，页面返回的数据会有重复内容，网站上会有个from参数去重，暂时不知怎么解析，所以才去手动去除重复画廊
-                let existedIds = self.items.map { $0.id }
-                let newBooks = books.filter { return !existedIds.contains($0.id) }
+                let newBooks = books.filter { return !self.existedIds.contains($0.id) }
+                let newExistedIds = newBooks.map { $0.id }
+                self.existedIds += newExistedIds    //缓存已获取的id，减少遍历
                 let insertIndexPaths = newBooks.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
                 self.items += newBooks
                 self.collectionView.performBatchUpdates({
@@ -167,7 +170,8 @@ class ListVC: BaseViewController {
     }
 
     func reloadData() {
-        checkingDoujinshi.removeAll()   //清除正在获取数据的id
+        checkingDoujinshi.removeAll()   //清除正在获取gdata数据的id
+        existedIds.removeAll()          //清楚已获取的id
         currentPage = -1
         loadingPage = -1
         let deleteIndexPaths = items.enumerated().map { IndexPath(item: $0.offset, section: 0)}
