@@ -211,15 +211,15 @@ class ListVC: BaseViewController {
             
             RequestManager.shared.getGData(doujinshi: doujinshi) { [weak self] gdata in
                 //网络请求有延迟，如果当前页面快速切换，需要判断当前画廊是否还存在
-                guard let gdata = gdata,
-                    let self = self,
+                guard let gdata = gdata else { return }
+                cachedGdatas["\(doujinshi.id)"] = gdata  //缓存 gdata
+                guard let self = self,
                     self.items.count >= index,
                     doujinshi.id == self.items[index].id,
                     checkingDoujinshi.contains(doujinshi.id)
                     else { return }
                 
                 doujinshi.gdata = gdata
-                cachedGdatas["\(doujinshi.id)"] = gdata  //缓存 gdata
                 //删除已请求的id
                 let temp = checkingDoujinshi.filter { return $0 != doujinshi.id }
                 checkingDoujinshi = temp
