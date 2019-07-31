@@ -375,14 +375,14 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             
             if let rating = doujinshi.gdata?.rating, rating > 0 {
                 cell.ratingLabel.text = "🌟\(rating)"
-                cell.ratingLabel.isHidden = false
+                cell.ratingLabel.isHidden = Defaults.List.isHideTag
                 cell.ratingLabel.layer.cornerRadius = cell.ratingLabel.bounds.height/2
             } else {
                 cell.ratingLabel.isHidden = true
             }
             
             if let category = doujinshi.gdata?.category {
-                cell.categoryLabel.isHidden = false
+                cell.categoryLabel.isHidden = Defaults.List.isHideTag
                 cell.categoryLabel.text = category
                 cell.categoryLabel.layer.cornerRadius = cell.categoryLabel.bounds.height/2
             } else {
@@ -458,14 +458,14 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         
         if let rating = doujinshi.gdata?.rating, rating > 0 {
             cell.ratingLabel.text = "🌟\(rating)"
-            cell.ratingLabel.isHidden = false
+            cell.ratingLabel.isHidden = Defaults.List.isHideTag
             cell.ratingLabel.layer.cornerRadius = cell.ratingLabel.bounds.height/2
         } else {
             cell.ratingLabel.isHidden = true
         }
         
         if let category = doujinshi.gdata?.category {
-            cell.categoryLabel.isHidden = false
+            cell.categoryLabel.isHidden = Defaults.List.isHideTag
             cell.categoryLabel.text = category
             cell.categoryLabel.layer.cornerRadius = cell.categoryLabel.bounds.height/2
         } else {
